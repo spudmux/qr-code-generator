@@ -82,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
     else params.delete('showurl');
     if (displayToggle && displayToggle.checked) params.set('display', '1');
     else params.delete('display');
-    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    // Use full path for GitHub Pages compatibility
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
     window.history.replaceState({}, '', newUrl);
   }
 
