@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const qrcodeContainer = document.getElementById('qrcode');
   const downloadBtn = document.getElementById('download-btn');
   const copyLinkBtn = document.getElementById('copy-link-btn');
+  const clearBtn = document.getElementById('clear-btn');
   let urlInImageDiv = document.getElementById('url-in-image');
   if (!urlInImageDiv) {
     urlInImageDiv = document.createElement('div');
@@ -177,7 +178,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function() {
+      // Push current state to history so user can go back
+      window.history.pushState({}, '', window.location.href);
+      urlInput.value = '';
+      textAbove.textContent = '';
+      textBelow.textContent = '';
+      includeUrlCheckbox.checked = false;
+      window.history.replaceState({}, '', window.location.pathname);
+      updateAll();
+    });
+  }
+
   // On load, populate from URL if present
   loadFromUrlParams();
   updateAll();
+  window.addEventListener('popstate', function() {
+    loadFromUrlParams();
+    updateAll();
+  });
 }); 

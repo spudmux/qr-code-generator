@@ -12,6 +12,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   text-align: center;
+  position: relative;
 }
 h1 {
   margin-bottom: 1em;
@@ -138,12 +139,44 @@ input[type="text"] {
   padding: 1.2em 0.5em;
   margin: 1.5em 0;
   background: #fafbfc;
+  position: relative;
 }
 .button-row {
   display: flex;
   justify-content: center;
   gap: 1em;
   margin-top: 1.5em;
+}
+.clear-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -80%);
+  background: #ffe5e5;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.5em;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+  padding: 0;
+}
+.clear-btn:hover, .clear-btn:focus {
+  background: #f44336;
+  color: #fff;
+  outline: none;
+}
+.clear-x {
+  display: inline-block;
+  transform: translateY(-2px);
 }
 @media (max-width: 500px) {
   .container {
