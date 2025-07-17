@@ -41,6 +41,9 @@ button:hover {
 }
 #qrcode {
   margin: 1.5em 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 @media (max-width: 500px) {
   .container {

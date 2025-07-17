@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
   const urlInput = document.getElementById('url-input');
-  const generateBtn = document.getElementById('generate-btn');
   const qrcodeContainer = document.getElementById('qrcode');
   const downloadBtn = document.getElementById('download-btn');
   let qr;
@@ -10,13 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadBtn.style.display = 'none';
   }
 
-  generateBtn.addEventListener('click', function() {
-    const url = urlInput.value.trim();
-    if (!url) {
-      clearQRCode();
-      return;
-    }
+  function generateQRCode(url) {
     clearQRCode();
+    if (!url) return;
     qr = new QRCode(qrcodeContainer, {
       text: url,
       width: 256,
@@ -28,10 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       downloadBtn.style.display = 'inline-block';
     }, 200); // Wait for QR to render
+  }
+
+  urlInput.addEventListener('input', function() {
+    const url = urlInput.value.trim();
+    generateQRCode(url);
   });
 
   downloadBtn.addEventListener('click', function() {
-    // qrcodejs renders a <canvas> or <img> inside the container
     const img = qrcodeContainer.querySelector('img') || qrcodeContainer.querySelector('canvas');
     if (img) {
       let dataUrl;
@@ -48,4 +47,9 @@ document.addEventListener('DOMContentLoaded', function() {
       document.body.removeChild(a);
     }
   });
+
+  // Optionally, generate QR code if input is pre-filled
+  if (urlInput.value.trim()) {
+    generateQRCode(urlInput.value.trim());
+  }
 }); 
