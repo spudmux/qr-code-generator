@@ -10,8 +10,20 @@
   <div class="container">
     <h1>URL to QR Code</h1>
     <input type="text" id="url-input" placeholder="Enter URL here">
-    <div id="qrcode"></div>
-    <button id="download-btn" style="display:none;">Download QR Code</button>
+    <label class="toggle-switch-label">
+      <input type="checkbox" id="include-url" class="toggle-switch">
+      <span class="slider"></span>
+      <span class="toggle-text">Include URL in image</span>
+    </label>
+    <div class="image-preview">
+      <h1 id="text-above" class="qr-label" contenteditable="true" spellcheck="false" data-placeholder="Click to edit title"></h1>
+      <div id="qrcode"></div>
+      <h2 id="text-below" class="qr-label" contenteditable="true" spellcheck="false" data-placeholder="Click to edit subtitle"></h2>
+    </div>
+    <div class="button-row">
+      <button id="download-btn">Download QR Code</button>
+      <button id="copy-link-btn" type="button">Copy Link</button>
+    </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="script.js"></script>
