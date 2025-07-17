@@ -9,11 +9,11 @@
 <body>
   <div class="container">
     <h1>URL to QR Code</h1>
-    <input type="text" id="url-input" placeholder="Enter URL here">
+    <input type="text" id="url-input" placeholder="Enter URL or Text here">
     <label class="toggle-switch-label">
       <input type="checkbox" id="include-url" class="toggle-switch">
       <span class="slider"></span>
-      <span class="toggle-text">Include URL in image</span>
+      <span class="toggle-text">Include in image</span>
     </label>
     <div class="image-preview">
       <button id="clear-btn" type="button" class="clear-btn" title="Clear all fields" aria-label="Clear all fields"><span class="clear-x">×</span></button>
@@ -24,6 +24,15 @@
     <div class="button-row">
       <button id="download-btn">Download QR Code</button>
       <button id="copy-link-btn" type="button">Copy Link</button>
+    </div>
+    <label class="toggle-switch-label display-toggle-label">
+      <input type="checkbox" id="display-toggle" class="toggle-switch">
+      <span class="slider"></span>
+      <span class="toggle-text">Display</span>
+    </label>
+    <div id="image-overlay" class="image-overlay" style="display:none;">
+      <button id="close-overlay" class="close-overlay" title="Close" aria-label="Close"><span class="close-x">×</span></button>
+      <img id="overlay-img" alt="QR code preview" />
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

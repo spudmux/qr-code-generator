@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', function() {
     urlInImageDiv.style.marginTop = '0.5em';
     textBelow.parentNode.insertBefore(urlInImageDiv, textBelow.nextSibling);
   }
+  const displayToggle = document.getElementById('display-toggle');
+  const imageOverlay = document.getElementById('image-overlay');
+  const overlayImg = document.getElementById('overlay-img');
+  const closeOverlayBtn = document.getElementById('close-overlay');
 
   function clearQRCode() {
     qrcodeContainer.innerHTML = '';
@@ -51,6 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     setTimeout(() => {
       downloadBtn.disabled = false;
+      if (displayToggle && displayToggle.checked) {
+        const dataUrl = generateImageDataUrl();
+        if (dataUrl) {
+          overlayImg.src = dataUrl;
+          imageOverlay.style.display = '';
+          document.body.style.overflow = 'hidden';
+        }
+      }
     }, 200); // Wait for QR to render
   }
 
@@ -68,6 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (getCleanText(textBelow)) params.set('below', getCleanText(textBelow));
     if (includeUrlCheckbox.checked) params.set('showurl', '1');
     else params.delete('showurl');
+    if (displayToggle && displayToggle.checked) params.set('display', '1');
+    else params.delete('display');
     const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
     window.history.replaceState({}, '', newUrl);
   }
@@ -78,6 +92,97 @@ document.addEventListener('DOMContentLoaded', function() {
     if (params.has('above')) textAbove.textContent = params.get('above');
     if (params.has('below')) textBelow.textContent = params.get('below');
     includeUrlCheckbox.checked = params.get('showurl') === '1';
+    if (displayToggle) displayToggle.checked = params.get('display') === '1';
+  }
+
+  function generateImageDataUrl() {
+    const url = urlInput.value.trim();
+    if (!url) return null;
+    const above = getCleanText(textAbove);
+    const below = getCleanText(textBelow);
+    const includeUrl = includeUrlCheckbox.checked;
+    const size = 256;
+    const padding = 20;
+    const h1Font = 'bold 24px Arial';
+    const h2Font = 'bold 18px Arial';
+    const urlFont = '14px Arial';
+    const h1LineHeight = 32;
+    const h2LineHeight = 26;
+    const urlLineHeight = 22;
+    const extraTitlePadding = 18;
+    const extraSubtitlePadding = 18;
+    const extraUrlPadding = 10;
+    let canvasHeight = size + padding * 2;
+    let aboveLines = above ? above.split('\n').length : 0;
+    let belowLines = below ? below.split('\n').length : 0;
+    let urlLines = includeUrl && url ? url.split('\n').length : 0;
+    if (above) canvasHeight += h1LineHeight * aboveLines + extraTitlePadding;
+    if (below) canvasHeight += h2LineHeight * belowLines + extraSubtitlePadding;
+    if (includeUrl && url) canvasHeight += urlLineHeight * urlLines + extraUrlPadding;
+    // High-DPI support
+    const dpr = 4;
+    const canvas = document.createElement('canvas');
+    canvas.width = (size + padding * 2) * dpr;
+    canvas.height = canvasHeight * dpr;
+    canvas.style.width = (size + padding * 2) + 'px';
+    canvas.style.height = canvasHeight + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+    ctx.textAlign = 'center';
+    let y = padding;
+    // Draw above text as h1
+    if (above) {
+      ctx.font = h1Font;
+      ctx.fillStyle = '#222';
+      above.split('\n').forEach(line => {
+        ctx.fillText(line, (size + padding * 2) / 2, y + h1LineHeight - 8);
+        y += h1LineHeight;
+      });
+      y += extraTitlePadding;
+    }
+    // Draw QR code
+    const img = qrcodeContainer.querySelector('img') || qrcodeContainer.querySelector('canvas');
+    if (img) {
+      let qrImg = img;
+      if (img.tagName.toLowerCase() === 'canvas') {
+        qrImg = new window.Image();
+        qrImg.src = img.toDataURL('image/png');
+      }
+      ctx.drawImage(qrImg, padding, y, size, size);
+    }
+    y += size;
+    // Draw below text as h2
+    if (below) {
+      y += extraSubtitlePadding;
+      ctx.font = h2Font;
+      ctx.fillStyle = '#222';
+      below.split('\n').forEach(line => {
+        ctx.fillText(line, (size + padding * 2) / 2, y + h2LineHeight - 8);
+        y += h2LineHeight;
+      });
+    }
+    // Draw URL if included
+    if (includeUrl && url) {
+      y += extraUrlPadding;
+      ctx.font = urlFont;
+      ctx.fillStyle = '#444';
+      ctx.fillText(url, (size + padding * 2) / 2, y + urlLineHeight - 8);
+      y += urlLineHeight;
+    }
+    return canvas.toDataURL('image/png');
+  }
+
+  function showOverlayWhenReady() {
+    setTimeout(() => {
+      const dataUrl = generateImageDataUrl();
+      if (dataUrl) {
+        overlayImg.src = dataUrl;
+        imageOverlay.style.display = '';
+        document.body.style.overflow = 'hidden';
+      }
+    }, 1500);
   }
 
   urlInput.addEventListener('input', updateAll);
@@ -191,11 +296,69 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  if (displayToggle) {
+    displayToggle.addEventListener('change', function() {
+      if (displayToggle.checked) {
+        const dataUrl = generateImageDataUrl();
+        if (dataUrl) {
+          overlayImg.src = dataUrl;
+          imageOverlay.style.display = '';
+          document.body.style.overflow = 'hidden';
+          updateUrlParams();
+        } else {
+          displayToggle.checked = false;
+        }
+      } else {
+        imageOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+        updateUrlParams();
+      }
+    });
+  }
+  if (closeOverlayBtn) {
+    closeOverlayBtn.addEventListener('click', function() {
+      imageOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+      displayToggle.checked = false;
+      updateUrlParams();
+    });
+  }
+
   // On load, populate from URL if present
   loadFromUrlParams();
   updateAll();
+  // If display is not checked, hide overlay (otherwise overlay will be shown by generateQRCode)
+  if (!(displayToggle && displayToggle.checked)) {
+    imageOverlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  // ESC key closes overlay
+  document.addEventListener('keydown', function(e) {
+    if (imageOverlay.style.display !== 'none' && (e.key === 'Escape' || e.key === 'Esc')) {
+      imageOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+      displayToggle.checked = false;
+      updateUrlParams();
+    }
+  });
+
   window.addEventListener('popstate', function() {
     loadFromUrlParams();
     updateAll();
+    // If display is checked, show overlay; otherwise, hide overlay
+    if (displayToggle && displayToggle.checked) {
+      setTimeout(() => {
+        const dataUrl = generateImageDataUrl();
+        if (dataUrl) {
+          overlayImg.src = dataUrl;
+          imageOverlay.style.display = '';
+          document.body.style.overflow = 'hidden';
+        }
+      }, 200);
+    } else {
+      imageOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
   });
 }); 
