@@ -21,6 +21,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const imageOverlay = document.getElementById('image-overlay');
   const overlayImg = document.getElementById('overlay-img');
   const closeOverlayBtn = document.getElementById('close-overlay');
+  let selectedEmoji = '';
+  const emojiPicker = document.getElementById('emoji-picker');
+  const emojiOverlay = document.getElementById('emoji-overlay');
+  if (emojiPicker) {
+    emojiPicker.addEventListener('click', function(e) {
+      if (e.target.classList.contains('emoji-btn')) {
+        selectedEmoji = e.target.dataset.emoji || '';
+        // Highlight selected
+        Array.from(emojiPicker.querySelectorAll('.emoji-btn')).forEach(btn => btn.classList.remove('selected'));
+        e.target.classList.add('selected');
+        updateAll();
+        updateEmojiOverlay();
+        updateUrlParams();
+      }
+    });
+  }
 
   function clearQRCode() {
     qrcodeContainer.innerHTML = '';
@@ -71,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     generateQRCode(url);
     updateUrlInImagePreview();
     updateUrlParams();
+    updateEmojiOverlay();
   }
 
   function updateUrlParams() {
@@ -82,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
     else params.delete('showurl');
     if (displayToggle && displayToggle.checked) params.set('display', '1');
     else params.delete('display');
+    if (selectedEmoji) params.set('emoji', selectedEmoji);
+    else params.delete('emoji');
     // Use full path for GitHub Pages compatibility
     const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
     window.history.replaceState({}, '', newUrl);
@@ -94,6 +113,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (params.has('below')) textBelow.textContent = params.get('below');
     includeUrlCheckbox.checked = params.get('showurl') === '1';
     if (displayToggle) displayToggle.checked = params.get('display') === '1';
+    selectedEmoji = params.get('emoji') || '';
+    // Update emoji picker highlight
+    if (emojiPicker) {
+      Array.from(emojiPicker.querySelectorAll('.emoji-btn')).forEach(btn => {
+        if (btn.dataset.emoji === selectedEmoji) btn.classList.add('selected');
+        else btn.classList.remove('selected');
+      });
+    }
+    updateEmojiOverlay();
   }
 
   function generateImageDataUrl() {
@@ -102,11 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const above = getCleanText(textAbove);
     const below = getCleanText(textBelow);
     const includeUrl = includeUrlCheckbox.checked;
+    const emoji = selectedEmoji;
     const size = 256;
     const padding = 20;
     const h1Font = 'bold 24px Arial';
     const h2Font = 'bold 18px Arial';
     const urlFont = '14px Arial';
+    const emojiFont = '48px serif';
     const h1LineHeight = 32;
     const h2LineHeight = 26;
     const urlLineHeight = 22;
@@ -152,6 +182,18 @@ document.addEventListener('DOMContentLoaded', function() {
         qrImg.src = img.toDataURL('image/png');
       }
       ctx.drawImage(qrImg, padding, y, size, size);
+      // Draw emoji in center if selected
+      if (emoji) {
+        ctx.font = emojiFont;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc((size + padding * 2) / 2, y + size / 2, size * 0.18, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.fillText(emoji, (size + padding * 2) / 2, y + size / 2 + 2);
+        ctx.restore();
+      }
     }
     y += size;
     // Draw below text as h2
@@ -245,6 +287,18 @@ document.addEventListener('DOMContentLoaded', function() {
         qrImg.src = img.toDataURL('image/png');
       }
       ctx.drawImage(qrImg, padding, y, size, size);
+      // Draw emoji in center if selected
+      if (selectedEmoji) {
+        ctx.font = '48px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, y + size / 2, size * 0.18, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.fillText(selectedEmoji, canvas.width / 2, y + size / 2 + 2);
+        ctx.restore();
+      }
     }
     y += size;
     // Draw below text as h2
@@ -292,8 +346,14 @@ document.addEventListener('DOMContentLoaded', function() {
       textAbove.textContent = '';
       textBelow.textContent = '';
       includeUrlCheckbox.checked = false;
+      selectedEmoji = '';
+      // Remove highlight from all emoji buttons
+      if (emojiPicker) {
+        Array.from(emojiPicker.querySelectorAll('.emoji-btn')).forEach(btn => btn.classList.remove('selected'));
+      }
       window.history.replaceState({}, '', window.location.pathname);
       updateAll();
+      updateEmojiOverlay();
     });
   }
 
@@ -325,9 +385,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  function updateEmojiOverlay() {
+    if (emojiOverlay) {
+      emojiOverlay.textContent = selectedEmoji || '';
+      emojiOverlay.style.display = selectedEmoji ? 'flex' : 'none';
+    }
+  }
+
   // On load, populate from URL if present
   loadFromUrlParams();
   updateAll();
+  updateEmojiOverlay();
   // If display is not checked, hide overlay (otherwise overlay will be shown by generateQRCode)
   if (!(displayToggle && displayToggle.checked)) {
     imageOverlay.style.display = 'none';
@@ -347,6 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('popstate', function() {
     loadFromUrlParams();
     updateAll();
+    updateEmojiOverlay();
     // If display is checked, show overlay; otherwise, hide overlay
     if (displayToggle && displayToggle.checked) {
       setTimeout(() => {

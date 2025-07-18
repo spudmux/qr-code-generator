@@ -18,8 +18,30 @@
     <div class="image-preview">
       <button id="clear-btn" type="button" class="clear-btn" title="Clear all fields" aria-label="Clear all fields"><span class="clear-x">×</span></button>
       <h1 id="text-above" class="qr-label" contenteditable="true" spellcheck="false" data-placeholder="Click to edit title"></h1>
-      <div id="qrcode"></div>
+      <div class="qrcode-wrapper">
+        <div id="qrcode"></div>
+        <div id="emoji-overlay"></div>
+      </div>
       <h2 id="text-below" class="qr-label" contenteditable="true" spellcheck="false" data-placeholder="Click to edit subtitle"></h2>
+    </div>
+    <div class="emoji-picker" id="emoji-picker">
+      <button class="emoji-btn" data-emoji="" title="No emoji">🚫</button>
+      <button class="emoji-btn" data-emoji="😀" title="Smile">😀</button>
+      <button class="emoji-btn" data-emoji="😎" title="Cool">😎</button>
+      <button class="emoji-btn" data-emoji="🚀" title="Rocket">🚀</button>
+      <button class="emoji-btn" data-emoji="⭐️" title="Star">⭐️</button>
+      <button class="emoji-btn" data-emoji="❤️" title="Heart">❤️</button>
+      <button class="emoji-btn" data-emoji="🏆" title="Trophy">🏆</button>
+      <button class="emoji-btn" data-emoji="🛒" title="Cart">🛒</button>
+      <button class="emoji-btn" data-emoji="🏢" title="Office">🏢</button>
+      <button class="emoji-btn" data-emoji="🏫" title="School">🏫</button>
+      <button class="emoji-btn" data-emoji="🏥" title="Hospital">🏥</button>
+      <button class="emoji-btn" data-emoji="🏠" title="Home">🏠</button>
+      <button class="emoji-btn" data-emoji="🧑‍💻" title="Coder">🧑‍💻</button>
+      <button class="emoji-btn" data-emoji="🐶" title="Dog">🐶</button>
+      <button class="emoji-btn" data-emoji="🐱" title="Cat">🐱</button>
+      <button class="emoji-btn" data-emoji="🍕" title="Pizza">🍕</button>
+      <button class="emoji-btn" data-emoji="🎉" title="Party">🎉</button>
     </div>
     <div class="button-row">
       <button id="download-btn">Download QR Code</button>
