@@ -1,0 +1,19 @@
+{
+  "name": "qr-code-generator",
+  "version": "1.0.0",
+  "description": "A lightweight QR code generator webapp with emoji overlay and E2E tests.",
+  "scripts": {
+    "start": "serve . -l 8080 -s",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test": "start-server-and-test start http://localhost:8080 cypress:run"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.6",
+    "serve": "^14.2.0",
+    "start-server-and-test": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
